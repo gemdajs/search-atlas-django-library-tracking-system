@@ -1,5 +1,7 @@
 from datetime import timedelta
 
+from django.db.models import Q, F
+from django.db.models.aggregates import Count
 from rest_framework import viewsets, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -52,6 +54,18 @@ class BookViewSet(viewsets.ModelViewSet):
 class MemberViewSet(viewsets.ModelViewSet):
     queryset = Member.objects.all()
     serializer_class = MemberSerializer
+
+    @action(detail=False, methods=['get'], url_path="top-active")
+    def top_active(self, request, **kwargs):
+        members = Member.objects.values(
+            member_id=F("id"),
+            username=F("user__username"),
+            email=F("user__username")
+        ).annotate(
+            no_of_active_loans=Count("loans", distinct=True, filter=Q(is_returned=False))
+        ).order_by("-no_of_active_loans")[:5]
+
+        return Response({'data': members}, status=status.HTTP_200_OK)
 
 class LoanViewSet(viewsets.ModelViewSet):
     queryset = Loan.objects.all()
