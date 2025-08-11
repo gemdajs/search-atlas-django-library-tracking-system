@@ -1,3 +1,4 @@
+from django.db.models import IntegerField
 from rest_framework import serializers
 from .models import Author, Book, Member, Loan
 from django.contrib.auth.models import User
@@ -45,3 +46,15 @@ class LoanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Loan
         fields = ['id', 'book', 'book_id', 'member', 'member_id', 'loan_date', 'return_date', 'is_returned']
+
+
+class ExtendLoanSerializer(serializers.Serializer):
+    additional_days = IntegerField()
+
+    def validate(self, attrs):
+        additional_days = attrs.get("additional_days")
+
+        if additional_days < 1:
+            raise serializers.ValidationError("Days have to be positive")
+
+        return attrs;
