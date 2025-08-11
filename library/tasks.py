@@ -43,7 +43,7 @@ def check_overdue_loans_task():
         notify_member_of_overdue_books(member, books)
 
 
-def notify_member_of_overdue_books(member, books: List[Book] | QuerySet):
+def notify_member_of_overdue_books(member, books: List | QuerySet):
     email = member.email
     username = member.username
 
@@ -53,9 +53,14 @@ def notify_member_of_overdue_books(member, books: List[Book] | QuerySet):
     if count > 1:
         noun = pluralize(noun)
 
+    books_table = ""
+
+    for index, book in enumerate(books):
+        books_table += "{}. {} by {}\n".format(index + 1, book.get("title"), book.get("author_name"))
+
     app_send_email(
         'You have {} {} overdue'.format(count, noun),
-        'Hello {},\n\nYou have the following loaned {} overdue. Kindly return today.'.format(username, noun),
+        'Hello {},\n\nYou have the following loaned {} overdue. Kindly return today.\n\n{}'.format(username, noun, books_table),
         email
     )
 
