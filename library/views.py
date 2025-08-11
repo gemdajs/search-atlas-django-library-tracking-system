@@ -76,7 +76,7 @@ class LoanViewSet(viewsets.ModelViewSet):
         loan = self.get_object()
         additional_days = int(request.data.get('additional_days'))
 
-        if loan.due_date >= timezone.now():
+        if loan.due_date <= timezone.now():
             return Response({'error': 'Loan is already overdue.'}, status=status.HTTP_400_BAD_REQUEST)
 
         loan.due_date = loan.due_date + timedelta(days=additional_days)
