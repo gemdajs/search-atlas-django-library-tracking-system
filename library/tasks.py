@@ -43,7 +43,7 @@ def check_overdue_loans_task():
         notify_member_of_overdue_books(member, books)
 
 
-def notify_member_of_overdue_books(member, books: List | QuerySet):
+def notify_member_of_overdue_books(member, books):
     email = member.email
     username = member.username
 
